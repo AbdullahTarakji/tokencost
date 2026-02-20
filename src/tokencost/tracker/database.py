@@ -6,12 +6,21 @@ import json
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 from tokencost.config.settings import DEFAULT_DB_PATH, _ensure_dir
 
 
 def _get_connection(db_path: str | Path | None = None) -> sqlite3.Connection:
-    """Get a database connection, creating the table if needed."""
+    """Get a database connection, creating the table if needed.
+
+    Args:
+        db_path: Optional path to the SQLite database file.
+            If None, uses the default path from settings.
+
+    Returns:
+        An open SQLite connection with row_factory set to sqlite3.Row.
+    """
     path = str(db_path) if db_path else str(DEFAULT_DB_PATH)
     if db_path is None:
         _ensure_dir()
@@ -46,7 +55,22 @@ def log_call(
     metadata: dict | None = None,
     db_path: str | Path | None = None,
 ) -> int:
-    """Log an API call to the database. Returns the row id."""
+    """Log an API call to the database.
+
+    Args:
+        provider: The API provider (e.g., 'openai', 'anthropic').
+        model: The model name (e.g., 'gpt-4o').
+        input_tokens: Number of input/prompt tokens.
+        output_tokens: Number of output/completion tokens.
+        cost: Calculated cost in USD.
+        project: Project name for grouping calls.
+        tags: Optional list of tags for categorization.
+        metadata: Optional metadata dictionary.
+        db_path: Optional database path override.
+
+    Returns:
+        The row ID of the inserted record.
+    """
     conn = _get_connection(db_path)
     try:
         cursor = conn.execute(
@@ -78,8 +102,20 @@ def get_calls(
     model: str | None = None,
     project: str | None = None,
     db_path: str | Path | None = None,
-) -> list[dict]:
-    """Query API calls with optional filters."""
+) -> list[dict[str, Any]]:
+    """Query API calls with optional filters.
+
+    Args:
+        start_date: ISO 8601 start date filter (inclusive).
+        end_date: ISO 8601 end date filter (inclusive).
+        provider: Filter by provider name.
+        model: Filter by model name.
+        project: Filter by project name.
+        db_path: Optional database path override.
+
+    Returns:
+        A list of call records as dictionaries.
+    """
     conn = _get_connection(db_path)
     try:
         query = "SELECT * FROM api_calls WHERE 1=1"
@@ -109,7 +145,15 @@ def get_calls(
 
 
 def delete_calls(before_date: str, db_path: str | Path | None = None) -> int:
-    """Delete calls before a given date. Returns count deleted."""
+    """Delete calls recorded before a given date.
+
+    Args:
+        before_date: ISO 8601 date string; calls before this are deleted.
+        db_path: Optional database path override.
+
+    Returns:
+        The number of records deleted.
+    """
     conn = _get_connection(db_path)
     try:
         cursor = conn.execute("DELETE FROM api_calls WHERE timestamp < ?", (before_date,))
@@ -120,7 +164,11 @@ def delete_calls(before_date: str, db_path: str | Path | None = None) -> int:
 
 
 def reset(db_path: str | Path | None = None) -> None:
-    """Clear all data from the database."""
+    """Clear all data from the database.
+
+    Args:
+        db_path: Optional database path override.
+    """
     conn = _get_connection(db_path)
     try:
         conn.execute("DELETE FROM api_calls")

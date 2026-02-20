@@ -38,7 +38,15 @@ def _normalize(name: str) -> str:
 
 
 def get_model_pricing(model: str) -> dict[str, float | str] | None:
-    """Look up pricing for a model, with fuzzy matching support."""
+    """Look up pricing for a model, with fuzzy matching support.
+
+    Args:
+        model: The model name to look up (e.g., 'gpt-4o').
+
+    Returns:
+        A dict with 'input', 'output' (per 1M tokens), and 'provider',
+        or None if the model is not found.
+    """
     if model in PRICING:
         return PRICING[model]
     # Fuzzy match
@@ -50,7 +58,19 @@ def get_model_pricing(model: str) -> dict[str, float | str] | None:
 
 
 def calculate_cost(model: str, input_tokens: int, output_tokens: int) -> float:
-    """Calculate the cost of an API call in dollars."""
+    """Calculate the cost of an API call in US dollars.
+
+    Args:
+        model: The model name.
+        input_tokens: Number of input/prompt tokens.
+        output_tokens: Number of output/completion tokens.
+
+    Returns:
+        The total cost in USD.
+
+    Raises:
+        ValueError: If the model is not found in the pricing database.
+    """
     pricing = get_model_pricing(model)
     if pricing is None:
         raise ValueError(f"Unknown model: {model}")
@@ -60,7 +80,14 @@ def calculate_cost(model: str, input_tokens: int, output_tokens: int) -> float:
 
 
 def list_models(provider: str | None = None) -> list[dict[str, str | float]]:
-    """List all models, optionally filtered by provider."""
+    """List all available models with their pricing information.
+
+    Args:
+        provider: Optional provider filter (e.g., 'openai', 'anthropic').
+
+    Returns:
+        A list of dicts with model name, input/output pricing, and provider.
+    """
     results = []
     for name, info in PRICING.items():
         if provider is None or info["provider"] == provider:

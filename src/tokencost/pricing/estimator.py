@@ -29,7 +29,18 @@ def estimate_tokens(text: str, model: str = "gpt-4o") -> int:
 
 
 def estimate_cost(text: str, model: str = "gpt-4o") -> float:
-    """Estimate the input cost for the given text and model."""
+    """Estimate the input cost for the given text and model.
+
+    Args:
+        text: The input text to estimate cost for.
+        model: The model to use for pricing (default: 'gpt-4o').
+
+    Returns:
+        The estimated input cost in USD.
+
+    Raises:
+        ValueError: If the model is not found in the pricing database.
+    """
     pricing = get_model_pricing(model)
     if pricing is None:
         raise ValueError(f"Unknown model: {model}")
