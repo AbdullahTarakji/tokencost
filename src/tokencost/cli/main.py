@@ -20,7 +20,10 @@ from tokencost.tracker.database import get_calls, log_call, reset
 @click.group(invoke_without_command=True)
 @click.pass_context
 def cli(ctx: click.Context) -> None:
-    """💰 TokenCost — Track LLM API costs."""
+    """💰 TokenCost — Track LLM API costs.
+
+    When invoked without a subcommand, launches the interactive TUI dashboard.
+    """
     if ctx.invoked_subcommand is None:
         from tokencost.dashboard.app import run_dashboard
 

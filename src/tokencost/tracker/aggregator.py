@@ -10,7 +10,17 @@ from tokencost.tracker.database import _get_connection
 
 
 def _period_start(period: str) -> str | None:
-    """Get the ISO 8601 start timestamp for a period."""
+    """Get the ISO 8601 start timestamp for a period.
+
+    Args:
+        period: One of 'today', 'week', 'month', or 'all'.
+
+    Returns:
+        An ISO 8601 timestamp string, or None for 'all'.
+
+    Raises:
+        ValueError: If the period is not recognized.
+    """
     now = datetime.now(timezone.utc)
     if period == "today":
         start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -26,8 +36,16 @@ def _period_start(period: str) -> str | None:
     return start.isoformat()
 
 
-def summary(period: str = "today", db_path: str | Path | None = None) -> dict:
-    """Get summary stats for a period."""
+def summary(period: str = "today", db_path: str | Path | None = None) -> dict[str, object]:
+    """Get summary statistics for a given time period.
+
+    Args:
+        period: Time period ('today', 'week', 'month', or 'all').
+        db_path: Optional database path override.
+
+    Returns:
+        A dict with keys: period, call_count, total_cost, total_tokens.
+    """
     conn = _get_connection(db_path)
     try:
         start = _period_start(period)
@@ -50,8 +68,16 @@ def summary(period: str = "today", db_path: str | Path | None = None) -> dict:
         conn.close()
 
 
-def by_model(period: str = "today", db_path: str | Path | None = None) -> list[dict]:
-    """Breakdown by model for a period."""
+def by_model(period: str = "today", db_path: str | Path | None = None) -> list[dict[str, object]]:
+    """Get cost breakdown by model for a given period.
+
+    Args:
+        period: Time period ('today', 'week', 'month', or 'all').
+        db_path: Optional database path override.
+
+    Returns:
+        A list of dicts with model, provider, count, total_cost, and token counts.
+    """
     conn = _get_connection(db_path)
     try:
         start = _period_start(period)
@@ -69,8 +95,16 @@ def by_model(period: str = "today", db_path: str | Path | None = None) -> list[d
         conn.close()
 
 
-def by_project(period: str = "today", db_path: str | Path | None = None) -> list[dict]:
-    """Breakdown by project for a period."""
+def by_project(period: str = "today", db_path: str | Path | None = None) -> list[dict[str, object]]:
+    """Get cost breakdown by project for a given period.
+
+    Args:
+        period: Time period ('today', 'week', 'month', or 'all').
+        db_path: Optional database path override.
+
+    Returns:
+        A list of dicts with project, count, and total_cost.
+    """
     conn = _get_connection(db_path)
     try:
         start = _period_start(period)
@@ -85,8 +119,16 @@ def by_project(period: str = "today", db_path: str | Path | None = None) -> list
         conn.close()
 
 
-def by_provider(period: str = "today", db_path: str | Path | None = None) -> list[dict]:
-    """Breakdown by provider for a period."""
+def by_provider(period: str = "today", db_path: str | Path | None = None) -> list[dict[str, object]]:
+    """Get cost breakdown by provider for a given period.
+
+    Args:
+        period: Time period ('today', 'week', 'month', or 'all').
+        db_path: Optional database path override.
+
+    Returns:
+        A list of dicts with provider, count, and total_cost.
+    """
     conn = _get_connection(db_path)
     try:
         start = _period_start(period)
@@ -101,8 +143,16 @@ def by_provider(period: str = "today", db_path: str | Path | None = None) -> lis
         conn.close()
 
 
-def daily_costs(days: int = 30, db_path: str | Path | None = None) -> list[dict]:
-    """Daily cost trend for the last N days."""
+def daily_costs(days: int = 30, db_path: str | Path | None = None) -> list[dict[str, object]]:
+    """Get daily cost trend for the last N days.
+
+    Args:
+        days: Number of days to look back.
+        db_path: Optional database path override.
+
+    Returns:
+        A list of dicts with date, total_cost, and count per day.
+    """
     conn = _get_connection(db_path)
     try:
         start = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
@@ -116,8 +166,19 @@ def daily_costs(days: int = 30, db_path: str | Path | None = None) -> list[dict]
         conn.close()
 
 
-def budget_status(db_path: str | Path | None = None, config_path: str | Path | None = None) -> dict:
-    """Check current spend vs budget for all periods."""
+def budget_status(
+    db_path: str | Path | None = None, config_path: str | Path | None = None
+) -> dict[str, dict[str, object]]:
+    """Check current spending against budget limits for all periods.
+
+    Args:
+        db_path: Optional database path override.
+        config_path: Optional config file path override.
+
+    Returns:
+        A dict keyed by period ('daily', 'weekly', 'monthly') with
+        limit, spent, remaining, percentage, and exceeded status.
+    """
     config = load_config(config_path)
     result = {}
     for period_name, limit in [

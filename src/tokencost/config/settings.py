@@ -38,7 +38,14 @@ def _ensure_dir() -> None:
 
 
 def load_config(path: str | Path | None = None) -> Config:
-    """Load configuration from YAML file, using defaults if missing."""
+    """Load configuration from a YAML file, falling back to defaults.
+
+    Args:
+        path: Optional path to the config file. Uses ~/.tokencost/config.yaml if None.
+
+    Returns:
+        A Config instance with loaded or default values.
+    """
     config_path = Path(path) if path else DEFAULT_CONFIG_PATH
     config = Config()
 
@@ -64,7 +71,12 @@ def load_config(path: str | Path | None = None) -> Config:
 
 
 def save_config(config: Config, path: str | Path | None = None) -> None:
-    """Save configuration to YAML file."""
+    """Save configuration to a YAML file.
+
+    Args:
+        config: The Config instance to persist.
+        path: Optional path to write to. Uses ~/.tokencost/config.yaml if None.
+    """
     config_path = Path(path) if path else DEFAULT_CONFIG_PATH
     _ensure_dir()
 
