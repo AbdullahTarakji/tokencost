@@ -15,7 +15,7 @@
            │
      ┌─────▼──────┐     ┌──────────────┐
      │ Aggregator  │     │    Proxy     │
-     │ (summaries) │     │  (aiohttp)   │──► OpenAI/Anthropic APIs
+     │ (summaries) │     │   (httpx)    │──► OpenAI/Anthropic APIs
      └─────┬──────┘     └──────┬───────┘
            │                    │
      ┌─────▼────────────────────▼──────┐
@@ -35,8 +35,8 @@
 
 ## Storage
 
-- **Database**: `~/.local/share/tokencost/costs.db` (SQLite)
-- **Config**: `~/.config/tokencost/config.yaml` (YAML)
+- **Database**: `~/.tokencost/tokencost.db` (SQLite)
+- **Config**: `~/.tokencost/config.yaml` (YAML)
 
 ## Key Design Decisions
 

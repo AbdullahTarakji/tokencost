@@ -8,10 +8,6 @@
 
 Stop guessing how much your AI calls cost. `tokencost` gives you a CLI, a TUI dashboard, and a transparent HTTP proxy that automatically logs every API call with precise cost breakdowns.
 
-<p align="center">
-  <img src="docs/demo.gif" alt="tokencost demo" width="700">
-</p>
-
 ## ✨ Features
 
 - **📊 Interactive Dashboard** — Real-time TUI with cost charts, model breakdowns, and budget progress bars
@@ -127,7 +123,7 @@ tokencost models
 
 ## ⚙️ Configuration
 
-`tokencost` uses `~/.config/tokencost/config.yaml`:
+`tokencost` uses `~/.tokencost/config.yaml`:
 
 ```yaml
 default_project: default
